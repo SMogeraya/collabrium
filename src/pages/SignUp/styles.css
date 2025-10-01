@@ -1,0 +1,14 @@
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 64px;
+}
+.form {
+  margin-top: 8px;
+}
+.submit-button {
+  margin-top: 24px;
+  margin-bottom: 16px;
+}

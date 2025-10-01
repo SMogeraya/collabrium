@@ -1,0 +1,23 @@
+.container {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.title {
+  margin-bottom: 24px;
+}
+
+.text-field {
+  margin-bottom: 16px;
+}
+
+.feedback {
+  margin-top: 16px;
+  color: green;
+}
+
+.send-button {
+  align-self: flex-start;
+}
