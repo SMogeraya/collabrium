@@ -1,31 +1,46 @@
-
-export const contacts = [
+export const initialContacts = [
   {
     id: 1,
-    name: 'John Doe',
-    avatar: 'https://i.pravatar.cc/150?img=1',
+    name: 'Alice',
+    avatar: '',
+    isGroup: false,
     messages: [
-      { id: 1, text: 'Hey!', sender: 'them' },
-      { id: 2, text: 'How are you?', sender: 'them' },
-      { id: 3, text: 'I am good, thanks!', sender: 'me' },
+      { id: 1, text: 'Hey!', sender: 'Alice' },
+      { id: 2, text: 'How are you?', sender: 'me' },
     ],
-    details: {
-      email: 'john.doe@example.com',
-      phone: '123-456-7890',
-      bio: 'Software Developer',
-    },
+    // https://i.pravatar.cc/150?img=1
+    members: [
+        { name: 'Alice', avatar: '' },
+        { name: 'Me', avatar: '' },
+    ]
   },
   {
     id: 2,
-    name: 'Jane Smith',
-    avatar: 'https://i.pravatar.cc/150?img=2',
+    name: 'Bob',
+    avatar: '',
+    isGroup: false,
     messages: [
-      { id: 1, text: 'Hi there!', sender: 'them' },
+        { id: 1, text: 'Hi there!', sender: 'Bob' },
     ],
-    details: {
-      email: 'jane.smith@example.com',
-      phone: '098-765-4321',
-      bio: 'Designer',
-    },
+    members: [
+        { name: 'Bob', avatar: '' },
+        { name: 'Me', avatar: '' },
+    ]
+  },
+  {
+    id: 'group-1',
+    name: 'Project Discussion',
+    avatar: '',
+    isGroup: true,
+    messages: [
+        { id: 1, text: 'Let\'s discuss the project timeline', sender: 'Charlie', tag: 'timeline' },
+        { id: 2, text: 'Sure, I have some updates', sender: 'me', tag: 'updates' },
+    ],
+    members: [
+      { name: 'Charlie', avatar: '' },
+      { name: 'David', avatar: '' },
+      { name: 'Me', avatar: '' },
+    ],
   },
 ];
+
