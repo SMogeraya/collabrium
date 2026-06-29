@@ -1,76 +1,103 @@
 import React, { useState } from 'react';
-import { Button, TextField, Typography, Box, Container, Paper } from '@mui/material';
+import { Button, TextField, Avatar, Typography, Box, Link } from '@mui/material';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebase';
-import './styles.css';
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from '../../firebase';
+import AuthLayout from '../../components/AuthLayout';
 
-const Register = ({ setShowRegister }) => {
+const Register = ({ setShowRegister, themeMode, toggleTheme }) => {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState('');
 
   const handleSubmit = async (event) => {
+    setLoading(true);
     event.preventDefault();
+    setError('');
+
+    if (!username) {
+      setError("Username is required.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      const avatar = avatarUrl || `https://i.pravatar.cc/150?u=${cred.user.uid}`;
+      await setDoc(doc(db, "persons", cred.user.uid), {
+        uid: cred.user.uid,
+        username: username,
+        email: email,
+        avatar: avatar,
+        role: 'user' // Set default role for new users
+      });
     } catch (error) {
       setError(error.message);
+    }
+    finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box className="container">
-        <Paper
-          elevation={3}
-          className="paper"
-        >
-          <Typography component="h1" variant="h5">
-            Sign up
-          </Typography>
-          {error && <Typography color="error">{error}</Typography>}
-          <Box component="form" onSubmit={handleSubmit} noValidate className="form">
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              className="submit-button"
-            >
-              Sign Up
-            </Button>
-            <Button
-              fullWidth
-              onClick={() => setShowRegister(false)}
-            >
-              {"Already have an account? Sign In"}
-            </Button>
-          </Box>
-        </Paper>
+    <AuthLayout title="Sign Up" themeMode={themeMode} toggleTheme={toggleTheme}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3 }}>
+        <Avatar src={avatarUrl} sx={{ width: 80, height: 80, mb: 2 }} />
       </Box>
-    </Container>
+      {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
+      <Box component="form" onSubmit={handleSubmit} noValidate>
+        <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="username"
+            label="Username"
+            name="username"
+            autoComplete="username"
+            autoFocus
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+        />
+        <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+        />
+        <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+        />
+        <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            disabled={loading}
+        >
+            Sign Up
+        </Button>
+        <Link href="#" variant="body2" onClick={() => setShowRegister(false)}>
+            {"Already have an account? Sign In"}
+        </Link>
+      </Box>
+    </AuthLayout>
   );
 };
 

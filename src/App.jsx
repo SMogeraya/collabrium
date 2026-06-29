@@ -1,13 +1,16 @@
+import React, { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import { useEffect, useState } from 'react';
 import { auth } from './firebase';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
+// import Intro from './pages/Intro';
 import { Box, CircularProgress, createTheme, ThemeProvider, CssBaseline } from '@mui/material';
+import { useUserStore } from './userStore';
 
-const theme = createTheme({
+const lightTheme = createTheme({
   palette: {
+    mode: 'light',
     primary: {
       main: '#89A8B2',
     },
@@ -16,29 +19,73 @@ const theme = createTheme({
     },
     background: {
       default: '#E5E1DA',
-      paper: '#B3C8CF',
+      paper: '#FFFFFF',
     },
     text: {
       primary: '#000000',
-      secondary: '#000000',
+      secondary: '#5f5f5f',
+    },
+  },
+});
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#89A8B2',
+    },
+    secondary: {
+      main: '#B3C8CF',
+    },
+    background: {
+      default: '#1a1a1a',
+      paper: '#2c2c2c',
+    },
+    text: {
+      primary: '#ffffff',
+      secondary: '#b3b3b3',
     },
   },
 });
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [showRegister, setShowRegister] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
+  const [themeMode, setThemeMode] = useState('light');
+  const { currentUser, isLoading, fetchUserInfo } = useUserStore();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
+      fetchUserInfo(user?.uid);
     });
-    return () => unsubscribe();
-  }, []);
 
-  if (loading) {
+    return () => {
+      unsubscribe();
+    };
+  }, [fetchUserInfo]);
+
+  const handleShowLogin = () => {
+    setShowIntro(false);
+    setShowRegister(false);
+  };
+
+  const handleShowRegister = () => {
+    setShowIntro(false);
+    setShowRegister(true);
+  };
+
+  const handleGetStarted = () => {
+      setShowIntro(false);
+      setShowRegister(true);
+  }
+
+  const toggleTheme = () => {
+    setThemeMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+  };
+
+  const theme = themeMode === 'light' ? lightTheme : darkTheme;
+
+  if (isLoading) {
     return (
       <Box
         sx={{
@@ -56,14 +103,22 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      {/* <CssBaseline />
-      {user ? (
+      <CssBaseline />
+       {currentUser ? (
         <Dashboard />
       ) : showRegister ? (
-        <Register setShowRegister={setShowRegister} />
+        <Register 
+            setShowRegister={setShowRegister} 
+            themeMode={themeMode} 
+            toggleTheme={toggleTheme} 
+        />
       ) : (
-        <Login setShowRegister={setShowRegister} />
-      )} */}<Dashboard />
+        <Login 
+            setShowRegister={setShowRegister} 
+            themeMode={themeMode} 
+            toggleTheme={toggleTheme} 
+        />
+      )}
     </ThemeProvider>
   );
 }
